@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/Solidform-labs/newsletter/configs"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/joho/godotenv"
 )
 
@@ -20,11 +19,12 @@ func main() {
 	db.Connect()
 
 	app := fiber.New()
+	defer app.Shutdown()
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	fmt.Println("Server is running on port", config.ApiPort)
+	log.Infof("Server is running on port %s", config.ApiPort)
 	app.Listen(":" + config.ApiPort)
 }

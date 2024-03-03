@@ -2,9 +2,9 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/Solidform-labs/newsletter/configs"
+	"github.com/gofiber/fiber/v2/log"
 	_ "github.com/lib/pq"
 )
 
@@ -23,7 +23,7 @@ func Connect() {
 		panic(err)
 	}
 
-	fmt.Println("Successfully connected to database!")
+	log.Info("Connected to database")
 }
 
 func GetDB() *sql.DB {
