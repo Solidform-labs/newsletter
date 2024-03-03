@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Solidform-labs/newsletter/configs"
+	"github.com/Solidform-labs/newsletter/internal/newsletter/api/routers"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -21,9 +22,7 @@ func main() {
 	app := fiber.New()
 	defer app.Shutdown()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	routers.Setup(app)
 
 	log.Infof("Server is running on port %s", config.ApiPort)
 	app.Listen(":" + config.ApiPort)
