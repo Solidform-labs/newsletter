@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Solidform-labs/newsletter/configs"
 	"github.com/gofiber/fiber/v2/log"
@@ -12,11 +13,11 @@ var db *sql.DB
 
 func Connect() {
 	config := configs.GetConfig()
-	db, err := sql.Open("postgres", config.DbConnectionString)
+	var err error
+	db, err = sql.Open("postgres", config.DbConnectionString)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
@@ -27,6 +28,7 @@ func Connect() {
 }
 
 func GetDB() *sql.DB {
+	fmt.Println("::db", db)
 	if db == nil {
 		Connect()
 	}

@@ -18,12 +18,12 @@ var configOnce sync.Once
 func GetConfig() Config {
 	configOnce.Do(func() {
 		// DB
-		user := os.Getenv("DB_USER")
-		password := os.Getenv("DB_PASSWORD")
 		host := os.Getenv("DB_HOST")
 		dbPort := os.Getenv("DB_PORT")
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
 		dbname := os.Getenv("DB_NAME")
-		dbConnectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, dbPort, dbname)
+		dbConnectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, dbPort, user, password, dbname)
 		// API
 		apiPort, ok := os.LookupEnv("API_PORT")
 		if !ok {
