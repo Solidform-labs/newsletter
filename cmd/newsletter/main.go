@@ -17,8 +17,7 @@ func main() {
 
 	config := configs.GetConfig()
 
-	db.Connect()
-	// defer db.GetDB().Close()
+	defer db.GetDB().Close()
 
 	app := fiber.New()
 	defer app.Shutdown()

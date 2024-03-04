@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/Solidform-labs/newsletter/configs"
 	"github.com/gofiber/fiber/v2/log"
@@ -28,7 +27,6 @@ func Connect() {
 }
 
 func GetDB() *sql.DB {
-	fmt.Println("::db", db)
 	if db == nil {
 		Connect()
 	}

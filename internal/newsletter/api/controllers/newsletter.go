@@ -55,5 +55,12 @@ func Unsubscribe(c *fiber.Ctx) error {
 		})
 	}
 
+	if err := db.DeleteSubscriber(email); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Could not unsubscribe",
+			"error":   err.Error(),
+		})
+	}
+
 	return c.SendStatus(fiber.StatusNoContent)
 }
