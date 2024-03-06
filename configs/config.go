@@ -25,9 +25,9 @@ func GetConfig() Config {
 		dbname := os.Getenv("DB_NAME")
 		dbConnectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, dbPort, user, password, dbname)
 		// API
-		apiPort, ok := os.LookupEnv("API_PORT")
+		apiPort, ok := os.LookupEnv("PORT")
 		if !ok {
-			apiPort = "3000"
+			apiPort = "8080"
 		}
 		// Config
 		config = Config{

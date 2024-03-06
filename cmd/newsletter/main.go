@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/Solidform-labs/newsletter/configs"
 	"github.com/Solidform-labs/newsletter/internal/newsletter/api/routers"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
@@ -10,9 +12,11 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
+	// Only load .env file if it exists
+	if _, err := os.Stat(".env"); err == nil {
+		if err := godotenv.Load(); err != nil {
+			log.Fatalf("Error loading .env file")
+		}
 	}
 
 	config := configs.GetConfig()
