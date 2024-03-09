@@ -9,6 +9,7 @@ import (
 type Config struct {
 	DbConnectionString string
 	ApiPort            string
+	Environment        string
 }
 
 var config Config
@@ -29,10 +30,16 @@ func GetConfig() Config {
 		if !ok {
 			apiPort = "8080"
 		}
+		// ENV
+		environment, ok := os.LookupEnv("ENVIRONMENT")
+		if !ok {
+			environment = "development"
+		}
 		// Config
 		config = Config{
 			DbConnectionString: dbConnectionString,
 			ApiPort:            apiPort,
+			Environment:        environment,
 		}
 	})
 	return config

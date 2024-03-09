@@ -8,6 +8,7 @@ import (
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -25,6 +26,14 @@ func main() {
 
 	app := fiber.New()
 	defer app.Shutdown()
+
+	app.Use(cors.New())
+
+	app.Use(cors.New(cors.Config{
+		AllowOriginsFunc: func(origin string) bool {
+			return config.Environment == "development"
+		},
+	}))
 
 	routers.Setup(app)
 
