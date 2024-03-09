@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/joho/godotenv"
 )
 
@@ -34,6 +35,8 @@ func main() {
 			return config.Environment == "development"
 		},
 	}))
+
+	app.Use(helmet.New())
 
 	routers.Setup(app)
 
