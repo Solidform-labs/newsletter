@@ -4,14 +4,11 @@ import (
 	"os"
 
 	"github.com/Solidform-labs/newsletter/configs"
+	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/middleware"
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/routers"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/healthcheck"
-	"github.com/gofiber/fiber/v2/middleware/helmet"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -30,19 +27,7 @@ func main() {
 	app := fiber.New()
 	defer app.Shutdown()
 
-	app.Use(cors.New())
-
-	app.Use(cors.New(cors.Config{
-		AllowOriginsFunc: func(origin string) bool {
-			return config.Environment == "development"
-		},
-	}))
-
-	app.Use(helmet.New())
-
-	app.Use(logger.New())
-
-	app.Use(healthcheck.New())
+	middleware.Setup(app)
 
 	routers.Setup(app)
 
