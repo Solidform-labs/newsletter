@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/Solidform-labs/newsletter/internal/newsletter/api/models"
+	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/models"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/Solidform-labs/newsletter/pkg/validation"
 	"github.com/gofiber/fiber/v2"

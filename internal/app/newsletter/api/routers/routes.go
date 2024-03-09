@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/Solidform-labs/newsletter/internal/newsletter/api/controllers"
+	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/controllers"
 	"github.com/gofiber/fiber/v2"
 )
 

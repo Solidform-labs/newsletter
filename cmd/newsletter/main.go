@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/Solidform-labs/newsletter/configs"
-	"github.com/Solidform-labs/newsletter/internal/newsletter/api/routers"
+	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/routers"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
