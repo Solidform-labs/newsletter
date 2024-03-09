@@ -3,11 +3,11 @@ package controllers
 import (
 	"github.com/Solidform-labs/newsletter/internal/newsletter/api/models"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
-	"github.com/go-playground/validator/v10"
+	"github.com/Solidform-labs/newsletter/pkg/validation"
 	"github.com/gofiber/fiber/v2"
 )
 
-func Subscribe(c *fiber.Ctx) error {
+func AddSubscriber(c *fiber.Ctx) error {
 	sub := new(models.Subscriber)
 
 	if err := c.BodyParser(sub); err != nil {
@@ -17,11 +17,9 @@ func Subscribe(c *fiber.Ctx) error {
 		})
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(sub); err != nil {
+	if !validation.IsValidEmail(sub.Email) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid email",
-			"error":   err.Error(),
+			"error": "Invalid email",
 		})
 	}
 
@@ -35,32 +33,37 @@ func Subscribe(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
-func Unsubscribe(c *fiber.Ctx) error {
-	email := c.Query("email")
-	if email == "" {
+func DeleteSubscriber(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "email is required",
+			"error": "id is required",
 		})
 	}
 
-	sub := models.Subscriber{
-		Email: email,
+	if validation.IsValidEmail(id) {
+		if err := db.DeleteSubscriberByEmail(id); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Could not unsubscribe",
+				"error":   err.Error(),
+			})
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+	if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
+		if err := db.DeleteSubscriberByID(intID); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Could not unsubscribe",
+				"error":   err.Error(),
+			})
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(sub); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid email",
-			"error":   err.Error(),
-		})
-	}
+	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		"error": "id is invalid",
+	})
 
-	if err := db.DeleteSubscriber(email); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Could not unsubscribe",
-			"error":   err.Error(),
-		})
-	}
-
-	return c.SendStatus(fiber.StatusNoContent)
 }

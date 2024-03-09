@@ -7,7 +7,12 @@ import (
 
 func Setup(app *fiber.App) {
 	v1 := app.Group("/v1")
+
 	newsletter := v1.Group("/newsletter")
-	newsletter.Post("/subscribe", controllers.Subscribe)
-	newsletter.Delete("/unsubscribe", controllers.Unsubscribe)
+
+	subs := newsletter.Group("/subscribers")
+	// subs.Get("/", controllers.ListSubscribers)
+	subs.Post("/", controllers.AddSubscriber)
+	// subs.Get("/:id", controllers.GetSubscriber)
+	subs.Delete("/:id", controllers.DeleteSubscriber)
 }
