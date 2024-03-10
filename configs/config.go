@@ -23,6 +23,16 @@ var configOnce sync.Once
 
 func GetConfig() Config {
 	configOnce.Do(func() {
+		// ENV
+		if k_service := os.Getenv("K_SERVICE"); k_service != "" {
+			config.Environment = "production"
+		} else {
+			if environment, ok := os.LookupEnv("ENVIRONMENT"); !ok {
+				config.Environment = "development"
+			} else {
+				config.Environment = environment
+			}
+		}
 		// DB
 		host := os.Getenv("DB_HOST")
 		dbPort := os.Getenv("DB_PORT")
@@ -55,12 +65,6 @@ func GetConfig() Config {
 			} else {
 				config.ApiRequestsExpiration = apiRequestsExpiration
 			}
-		}
-		// ENV
-		if environment, ok := os.LookupEnv("ENVIRONMENT"); !ok {
-			config.Environment = "development"
-		} else {
-			config.Environment = environment
 		}
 		// Fiber Storage
 		config.FiberStorageReset = config.Environment == "development"

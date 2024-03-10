@@ -15,6 +15,7 @@ func Create(config configs.Config) *postgres.Storage {
 	storageOnce.Do(func() {
 		storage = postgres.New(postgres.Config{
 			ConnectionURI: config.DbConnectionString,
+			Reset:         config.FiberStorageReset,
 		})
 	})
 	return storage
