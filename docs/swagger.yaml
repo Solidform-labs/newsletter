@@ -1,0 +1,80 @@
+basePath: /v1
+consumes:
+- application/json
+definitions:
+  models.BaseError:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  models.Subscriber:
+    properties:
+      email:
+        type: string
+    type: object
+host: https://newsletter-test-4aaa4eezza-ew.a.run.app
+info:
+  contact: {}
+  description: This is Solidform's Newsletter API to handle subscriptions and sending
+    emails
+  title: Newsletter API
+  version: "1.0"
+paths:
+  /newsletter/subscribers:
+    post:
+      consumes:
+      - application/json
+      description: Add a new subscriber to the newsletter
+      parameters:
+      - description: Subscriber object
+        in: body
+        name: subscriber
+        required: true
+        schema:
+          $ref: '#/definitions/models.Subscriber'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request Error message
+          schema:
+            $ref: '#/definitions/models.BaseError'
+        "500":
+          description: Internal Error message
+          schema:
+            $ref: '#/definitions/models.BaseError'
+      summary: Add a new subscriber
+      tags:
+      - subscribers
+  /newsletter/subscribers/{id}:
+    delete:
+      description: Delete a subscriber from the newsletter
+      parameters:
+      - description: Subscriber ID or email
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request Error message
+          schema:
+            $ref: '#/definitions/models.BaseError'
+        "500":
+          description: ' Internal Error message'
+          schema:
+            $ref: '#/definitions/models.BaseError'
+      summary: Delete a subscriber
+      tags:
+      - subscribers
+produces:
+- application/json
+schemes:
+- https
+swagger: "2.0"

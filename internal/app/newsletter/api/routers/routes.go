@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/controllers"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
 func Setup(app *fiber.App) {
@@ -15,4 +16,6 @@ func Setup(app *fiber.App) {
 	subs.Post("/", controllers.AddSubscriber)
 	// subs.Get("/:id", controllers.GetSubscriber)
 	subs.Delete("/:id", controllers.DeleteSubscriber)
+
+	app.Get("/swagger/*", swagger.HandlerDefault)
 }

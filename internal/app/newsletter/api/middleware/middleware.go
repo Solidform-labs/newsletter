@@ -31,5 +31,6 @@ func Setup(app *fiber.App) {
 	})
 	app.Use(limiter.New(limiter.Config{
 		Storage: storage,
+		Max:     10,
 	}))
 }

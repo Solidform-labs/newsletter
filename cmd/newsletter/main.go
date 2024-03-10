@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/Solidform-labs/newsletter/configs"
+	_ "github.com/Solidform-labs/newsletter/docs"
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/middleware"
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/routers"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
@@ -11,6 +12,15 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/joho/godotenv"
 )
+
+// @title Newsletter API
+// @version 1.0
+// @description This is Solidform's Newsletter API to handle subscriptions and sending emails
+// @host https://newsletter-test-4aaa4eezza-ew.a.run.app
+// @basepath /v1
+// @schemes https
+// @produce json
+// @accept json
 
 func main() {
 	// Only load .env file if it exists
@@ -26,6 +36,9 @@ func main() {
 
 	app := fiber.New()
 	defer app.Shutdown()
+	defer func() {
+		log.Info("Server is shutting down")
+	}()
 
 	middleware.Setup(app)
 
