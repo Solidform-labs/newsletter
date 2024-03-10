@@ -2,13 +2,13 @@ package middleware
 
 import (
 	"github.com/Solidform-labs/newsletter/configs"
+	"github.com/Solidform-labs/newsletter/internal/pkg/fiber_storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/storage/postgres/v2"
 )
 
 func Setup(app *fiber.App) {
@@ -26,11 +26,13 @@ func Setup(app *fiber.App) {
 
 	app.Use(healthcheck.New())
 
-	storage := postgres.New(postgres.Config{
-		ConnectionURI: config.DbConnectionString,
-	})
+	storage := fiber_storage.Create(config)
 	app.Use(limiter.New(limiter.Config{
-		Storage: storage,
-		Max:     10,
+		Storage:    storage,
+		Max:        config.ApiMaxRequests,
+		Expiration: config.ApiRequestsExpiration,
+		Next: func(c *fiber.Ctx) bool {
+			return c.IP() == "127.0.0.1"
+		},
 	}))
 }
