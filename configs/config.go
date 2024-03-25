@@ -15,6 +15,10 @@ type Config struct {
 	ApiMaxRequests        int
 	ApiRequestsExpiration time.Duration
 	FiberStorageReset     bool
+	SMTPHost              string
+	SMTPPort              int
+	SMTPUser              string
+	SMTPPassword          string
 }
 
 var config Config
@@ -33,22 +37,26 @@ func GetConfig() Config {
 				config.Environment = environment
 			}
 		}
+
 		// DB
 		host := os.Getenv("DB_HOST")
 		dbPort := os.Getenv("DB_PORT")
 		user := os.Getenv("DB_USER")
 		password := os.Getenv("DB_PASSWORD")
 		dbname := os.Getenv("DB_NAME")
+
 		if host == "" || dbPort == "" || user == "" || password == "" || dbname == "" {
 			panic("DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, and DB_NAME must be set")
 		}
 		config.DbConnectionString = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, dbPort, user, password, dbname)
+
 		// API
 		if apiPort, ok := os.LookupEnv("PORT"); !ok {
 			config.ApiPort = "8080"
 		} else {
 			config.ApiPort = apiPort
 		}
+
 		if apiMaxRequests, ok := os.LookupEnv("MAX_REQUESTS"); ok {
 			var err error
 			if config.ApiMaxRequests, err = strconv.Atoi(apiMaxRequests); err != nil {
@@ -57,6 +65,7 @@ func GetConfig() Config {
 		} else {
 			config.ApiMaxRequests = 20
 		}
+
 		if requestsExpiration, ok := os.LookupEnv("REQUESTS_EXPIRATION"); !ok {
 			config.ApiRequestsExpiration = 30 * time.Second
 		} else {
@@ -66,8 +75,20 @@ func GetConfig() Config {
 				config.ApiRequestsExpiration = apiRequestsExpiration
 			}
 		}
+
 		// Fiber Storage
 		config.FiberStorageReset = config.Environment == "development"
+
+		// Email Engine
+		if config.Environment == "production" {
+			config.SMTPHost = os.Getenv("SMTP_HOST")
+			config.SMTPPort, _ = strconv.Atoi(os.Getenv("SMTP_PORT"))
+			config.SMTPUser = os.Getenv("SMTP_USER")
+			config.SMTPPassword = os.Getenv("SMTP_PASSWORD")
+		} else {
+			config.SMTPHost = "localhost"
+			config.SMTPPort = 1025
+		}
 	})
 	return config
 }
