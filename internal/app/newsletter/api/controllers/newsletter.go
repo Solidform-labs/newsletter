@@ -95,7 +95,7 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 }
 
 
-func sendEmailToSubscribers() error {
+func SendEmailToSubscribers(c *fiber.Ctx) error {
 
 	subs, err := db.GetSubscribers()
 	if err != nil {
