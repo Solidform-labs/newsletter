@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/models"
 	"github.com/lib/pq"
 )
 
@@ -39,4 +40,31 @@ func DeleteSubscriberByID(id int) error {
 		return fmt.Errorf("no subscriber with id %d", id)
 	}
 	return err
+}
+
+
+func getSubscribers() ([]models.Subscriber, error) {
+	db := GetDB()
+
+	var subs []models.Subscriber
+	rows, err := db.Query("SELECT email FROM newsletter_subs")
+	
+	if err != nil {
+		log.Println("error", err)
+		return subs, fmt.Errorf("no subscribers")
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var sub models.Subscriber
+		err := rows.Scan(&sub.Email)
+		if err != nil {
+			log.Println("error", err)
+			return subs, fmt.Errorf("no subscribers")
+		}
+		subs = append(subs, sub)
+	}
+	
+	return subs, nil
 }
