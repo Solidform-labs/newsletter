@@ -42,13 +42,12 @@ func DeleteSubscriberByID(id int) error {
 	return err
 }
 
-
 func GetSubscribers() ([]models.Subscriber, error) {
 	db := GetDB()
 
 	var subs []models.Subscriber
 	rows, err := db.Query("SELECT email FROM newsletter_subs")
-	
+
 	if err != nil {
 		log.Println("error", err)
 		return subs, fmt.Errorf("no subscribers")
@@ -65,6 +64,28 @@ func GetSubscribers() ([]models.Subscriber, error) {
 		}
 		subs = append(subs, sub)
 	}
-	
+
 	return subs, nil
+}
+
+func GetSubscriberByid(id int, subscriber *models.Subscriber) error {
+	db := GetDB()
+	err := db.QueryRow("SELECT * newsletter_subs WHERE id = $1", id).Scan(&subscriber)
+	if err != nil {
+		log.Println("error", err)
+		return err
+	}
+
+	return nil
+}
+
+func GetSubscriberByEmail(email string, subscriber *models.Subscriber) error {
+	db := GetDB()
+	err := db.QueryRow("SELECT * newsletter_subs WHERE email = $1", email).Scan(&subscriber)
+	if err != nil {
+		log.Println("error", err)
+		return err
+	}
+
+	return nil
 }
