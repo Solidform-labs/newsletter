@@ -1,11 +1,16 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/models"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
+	"github.com/Solidform-labs/newsletter/internal/pkg/email"
 	"github.com/Solidform-labs/newsletter/pkg/validation"
 	"github.com/gofiber/fiber/v2"
 )
+
+// Add missing import statement
 
 // AddSubscriber godoc
 // @Summary Add a new subscriber
@@ -88,3 +93,19 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 	})
 
 }
+
+
+func SendEmailToSubscribers(c *fiber.Ctx) error {
+
+	subs, err := db.GetSubscribers()
+	if err != nil {
+		return err
+	}
+		err = email.SendNewsletter(subs, "Newsletter", "This is a test newsletter")
+		if err != nil {
+			log.Println("error", err)
+		}
+
+	return nil
+
+} 
