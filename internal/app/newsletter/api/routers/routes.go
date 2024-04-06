@@ -18,7 +18,7 @@ func Setup(app *fiber.App) {
 	subs.Delete("/:id", controllers.DeleteSubscriber)
 
 	subs.Post("/send", controllers.SendEmailToSubscribers)
-	subs.Post("/send/:id", controllers.SendEmailToSubscribers)
+	subs.Post("/send/:id", controllers.SendEmailToSubscriber)
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 }
