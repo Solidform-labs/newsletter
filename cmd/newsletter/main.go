@@ -27,8 +27,13 @@ import (
 
 func main() {
 	// Only load .env file if it exists
-	if _, err := os.Stat(".env"); err == nil {
-		if err := godotenv.Load(); err != nil {
+	envFile := ".env"
+	if configs.Environment() != "production" {
+		envFile = ".env.dev"
+	}
+	log.Infof("Loading %s file", envFile)
+	if _, err := os.Stat(envFile); err == nil {
+		if err := godotenv.Load(envFile); err != nil {
 			log.Fatalf("Error loading .env file")
 		}
 	}

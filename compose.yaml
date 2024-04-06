@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  fiber_storage:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fiber_storage
+    ports:
+      - "5432:5432"
+    volumes:
+      - fiber_storage_volume:/var/lib/postgresql/data
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+
+volumes:
+  fiber_storage_volume:
+  db_volume:

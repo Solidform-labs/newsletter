@@ -29,15 +29,7 @@ var configOnce sync.Once
 func GetConfig() Config {
 	configOnce.Do(func() {
 		// ENV
-		if k_service := os.Getenv("K_SERVICE"); k_service != "" {
-			config.Environment = "production"
-		} else {
-			if environment, ok := os.LookupEnv("ENVIRONMENT"); !ok {
-				config.Environment = "development"
-			} else {
-				config.Environment = environment
-			}
-		}
+		Environment()
 
 		// DB
 		host := os.Getenv("DB_HOST")
@@ -100,4 +92,18 @@ func GetConfig() Config {
 		}
 	})
 	return config
+}
+
+func Environment() string {
+	if k_service := os.Getenv("K_SERVICE"); k_service != "" {
+		config.Environment = "production"
+	} else {
+		if environment, ok := os.LookupEnv("ENVIRONMENT"); !ok {
+			config.Environment = "development"
+		} else {
+			config.Environment = environment
+		}
+	}
+
+	return config.Environment
 }
