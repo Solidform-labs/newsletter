@@ -43,7 +43,7 @@ func DeleteSubscriberByID(id int) error {
 }
 
 
-func getSubscribers() ([]models.Subscriber, error) {
+func GetSubscribers() ([]models.Subscriber, error) {
 	db := GetDB()
 
 	var subs []models.Subscriber
