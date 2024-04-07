@@ -23,6 +23,18 @@ services:
     volumes:
       - db_volume:/var/lib/postgresql/data
 
+  pgadmin4:
+    image: elestio/pgadmin:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 8000
+    ports:
+    - "8000:8000"
+    volumes:
+    - ./servers.json:/pgadmin4/servers.json
+
 volumes:
   fiber_storage_volume:
   db_volume:
