@@ -41,6 +41,7 @@ func main() {
 	config := configs.GetConfig()
 
 	db.Connect()
+	db.Init()
 
 	app := fiber.New()
 	middleware.Setup(app)
