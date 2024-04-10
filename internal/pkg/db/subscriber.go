@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/models"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/lib/pq"
 )
 
@@ -12,7 +12,7 @@ func CreateSubscriber(email string) error {
 	db := GetDB()
 	_, err := db.Exec("INSERT INTO newsletter_subs (email) VALUES ($1)", email)
 	if err != nil {
-		log.Println("error", err)
+		log.Warn("error: ", err)
 		if err, ok := err.(*pq.Error); ok && err.Code == UNIQUE_VIOLATION {
 			return fmt.Errorf("subscriber with email %s already exists", email)
 		}
@@ -24,7 +24,7 @@ func DeleteSubscriberByEmail(email string) error {
 	db := GetDB()
 	result, err := db.Exec("DELETE FROM newsletter_subs WHERE email = $1", email)
 	if rows, err := result.RowsAffected(); err != nil {
-		log.Println("error", err)
+		log.Warn("error: ", err)
 	} else if rows == 0 {
 		return fmt.Errorf("no subscriber with email %s", email)
 	}
@@ -35,7 +35,7 @@ func DeleteSubscriberByID(id int) error {
 	db := GetDB()
 	result, err := db.Exec("DELETE FROM newsletter_subs WHERE id = $1", id)
 	if rows, err := result.RowsAffected(); err != nil {
-		log.Println("error", err)
+		log.Warn("error: ", err)
 	} else if rows == 0 {
 		return fmt.Errorf("no subscriber with id %d", id)
 	}
@@ -49,7 +49,7 @@ func GetSubscribers() ([]models.Subscriber, error) {
 	rows, err := db.Query("SELECT email FROM newsletter_subs")
 
 	if err != nil {
-		log.Println("error", err)
+		log.Warn("error: ", err)
 		return subs, fmt.Errorf("no subscribers")
 	}
 
@@ -59,7 +59,7 @@ func GetSubscribers() ([]models.Subscriber, error) {
 		var sub models.Subscriber
 		err := rows.Scan(&sub.Email)
 		if err != nil {
-			log.Println("error", err)
+			log.Warn("error: ", err)
 			return subs, fmt.Errorf("no subscribers")
 		}
 		subs = append(subs, sub)
@@ -70,9 +70,9 @@ func GetSubscribers() ([]models.Subscriber, error) {
 
 func GetSubscriberByid(id int, subscriber *models.Subscriber) error {
 	db := GetDB()
-	err := db.QueryRow("SELECT * newsletter_subs WHERE id = $1", id).Scan(&subscriber)
+	err := db.QueryRow("SELECT email FROM newsletter_subs WHERE id = $1", id).Scan(&subscriber.Email)
 	if err != nil {
-		log.Println("error", err)
+		log.Warn("error: ", err)
 		return err
 	}
 
@@ -81,9 +81,9 @@ func GetSubscriberByid(id int, subscriber *models.Subscriber) error {
 
 func GetSubscriberByEmail(email string, subscriber *models.Subscriber) error {
 	db := GetDB()
-	err := db.QueryRow("SELECT * newsletter_subs WHERE email = $1", email).Scan(&subscriber)
+	err := db.QueryRow("SELECT email FROM newsletter_subs WHERE email = $1", email).Scan(&subscriber.Email)
 	if err != nil {
-		log.Println("error", err)
+		log.Warn("error: ", err)
 		return err
 	}
 
