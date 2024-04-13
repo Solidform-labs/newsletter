@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	DbConnectionString           string
+	ApiKey                       string
 	ApiPort                      string
 	Environment                  string
 	ApiMaxRequests               int
@@ -30,6 +31,12 @@ func GetConfig() Config {
 	configOnce.Do(func() {
 		// ENV
 		Environment()
+
+		//Auth
+		config.ApiKey = os.Getenv("API_KEY")
+		if config.ApiKey == "" {
+			panic("API_KEY must be set in the env variables ")
+		}
 
 		// DB
 		host := os.Getenv("DB_HOST")
