@@ -14,14 +14,13 @@ func Setup(app *fiber.App) {
 
 	subs := newsletter.Group("/subscribers")
 
-	app.Use(middleware.CheckAuth)
-
 	//unprotected routes
 	subs.Post("/", controllers.AddSubscriber)
 	subs.Delete("/:id", controllers.DeleteSubscriber)
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	//protected routes
+	app.Use(middleware.CheckAuth)
 	// subs.Get("/", controllers.ListSubscribers)
 	// subs.Get("/:id", controllers.GetSubscriber)
 	subs.Post("/send", controllers.SendEmailToSubscribers)
