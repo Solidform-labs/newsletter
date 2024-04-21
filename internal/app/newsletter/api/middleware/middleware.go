@@ -4,18 +4,19 @@ import (
 	"strings"
 
 	"github.com/Solidform-labs/newsletter/configs"
+	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/models"
 	"github.com/Solidform-labs/newsletter/internal/pkg/fiber_storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func CheckAuth(c *fiber.Ctx) error {
-	config := configs.GetConfig()
-
 	authHeader := c.Get("Authorization")
 
 	if authHeader == "" {
@@ -28,7 +29,19 @@ func CheckAuth(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON("Unauthorized")
 	}
 
-	if authHeaderSplit[1] != config.ApiKey {
+	tokenString := authHeaderSplit[1]
+
+	token, err := jwt.ParseWithClaims(tokenString, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(configs.GetConfig().JwtSecret), nil
+	})
+
+	if err != nil {
+		log.Warn(err)
+		return c.Status(fiber.StatusUnauthorized).JSON("Unauthorized")
+	}
+
+	if !token.Valid {
+		log.Warn("Token was not valid")
 		return c.Status(fiber.StatusUnauthorized).JSON("Unauthorized")
 	}
 

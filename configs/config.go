@@ -10,7 +10,7 @@ import (
 
 type Config struct {
 	DbConnectionString           string
-	ApiKey                       string
+	JwtSecret                       string
 	ApiPort                      string
 	Environment                  string
 	ApiMaxRequests               int
@@ -33,9 +33,9 @@ func GetConfig() Config {
 		Environment()
 
 		//Auth
-		config.ApiKey = os.Getenv("API_KEY")
-		if config.ApiKey == "" {
-			panic("API_KEY must be set in the env variables ")
+		config.JwtSecret = os.Getenv("JWT_SECRET")
+		if config.JwtSecret == "" {
+			panic("JWT_SECRET must be set in the env variables")
 		}
 
 		// DB
