@@ -11,16 +11,16 @@ import (
 func SendNewsletter(recipients []models.Subscriber, subject, body string) error {
 	config := configs.GetConfig()
 	var d *gomail.Dialer
-	if config.Environment == "development" {
+	if config.Environment != "development" {
 		d = gomail.NewDialer(config.SMTPHost, config.SMTPPort, config.SMTPUser, config.SMTPPassword)
 	} else {
 		d = &gomail.Dialer{Host: config.SMTPHost, Port: config.SMTPPort}
 	}
 	s, err := d.Dial()
-	defer s.Close()
 	if err != nil {
 		return err
 	}
+	defer s.Close()
 
 	m := gomail.NewMessage()
 	for _, r := range recipients {

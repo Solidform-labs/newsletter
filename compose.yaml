@@ -35,6 +35,14 @@ services:
     volumes:
     - ./servers.json:/pgadmin4/servers.json
 
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"  # SMTP server
+      - "8025:8025"  # Web interface
+    restart: always
+
+
 volumes:
   fiber_storage_volume:
   db_volume:
