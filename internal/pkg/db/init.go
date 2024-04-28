@@ -8,7 +8,7 @@ func Init() {
 	createTablesSQL := `
 	CREATE TABLE IF NOT EXISTS newsletter_subs (
 		id SERIAL PRIMARY KEY,
-		email TEXT NOT NULL
+		email TEXT NOT NULL UNIQUE
 	);
 	`
 
