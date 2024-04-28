@@ -150,24 +150,7 @@ func SendEmailToSubscriber(c *fiber.Ctx) error {
 }
 
 func AuthenticateAndSendToken(c *fiber.Ctx) error {
-	dev1 := models.Dev{
-		Email:    "tariqalnabhani@hotmail.com",
-		Password: "$2a$10$MA4Zw0MVylMbk/tQK62wieZMWGuUSyF9pdGUtHeFv0k2o.WaRWLqO",
-	}
-
-	dev2 := models.Dev{
-		Email:    "nacho@gmail.com",
-		Password: "$2a$10$MA4Zw0MVylMbk/tQK62wieZMWGuUSyF9pdGUtHeFv0k2o.WaRWLqO",
-	}
-
-	dev3 := models.Dev{
-		Email:    "paco@gmail.com",
-		Password: "$2a$10$MA4Zw0MVylMbk/tQK62wieZMWGuUSyF9pdGUtHeFv0k2o.WaRWLqO",
-	}
-
-	devs := [3]models.Dev{dev1, dev2, dev3}
-
-	reqBody := new(models.Dev)
+	reqBody := new(models.User)
 
 	if err := c.BodyParser(reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
@@ -176,20 +159,16 @@ func AuthenticateAndSendToken(c *fiber.Ctx) error {
 		})
 	}
 
-	var foundDev models.Dev
+	var foundUser models.User
 
-	for _, dev := range devs {
-		if dev.Email == reqBody.Email {
-			foundDev = dev
-		}
+	if err := db.GetUserByEmail(reqBody.Email, &foundUser); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
+			Message: "Could not find user",
+			Error:   err.Error(),
+		})
 	}
 
-	if foundDev == (models.Dev{}) {
-		log.Warnf("User %s not found in DB", reqBody.Email)
-		return c.Status(fiber.StatusUnauthorized).JSON("Unauthorized")
-	}
-
-	if !encryptdecrypt.CheckPassword(foundDev.Password, reqBody.Password) {
+	if !encryptdecrypt.CheckPassword(foundUser.Password, reqBody.Password) {
 		log.Warn("Password did not match")
 		return c.Status(fiber.StatusUnauthorized).JSON("Unauthorized")
 	}

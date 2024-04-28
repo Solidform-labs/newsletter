@@ -11,11 +11,11 @@ func Init() {
 		email TEXT NOT NULL UNIQUE
 	);
 
-	CREATE TABLE IF NOT EXISTS users {
+	CREATE TABLE IF NOT EXISTS users (
 		id SMALLSERIAL PRIMARY KEY,
 		email TEXT NOT NULL UNIQUE,
 		password TEXT NOT NULL
-	}
+	);
 	`
 
 	if res, err := db.Exec(createTablesSQL); err != nil {
