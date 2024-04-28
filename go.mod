@@ -6,9 +6,11 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.2
 	github.com/gofiber/storage/postgres/v2 v2.0.3
 	github.com/gofiber/swagger v1.0.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/swaggo/swag v1.16.3
+	golang.org/x/crypto v0.19.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -37,7 +39,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.52.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

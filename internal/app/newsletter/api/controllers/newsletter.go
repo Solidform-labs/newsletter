@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"log"
-
 	"github.com/Solidform-labs/newsletter/internal/app/newsletter/api/models"
 	"github.com/Solidform-labs/newsletter/internal/pkg/db"
 	"github.com/Solidform-labs/newsletter/internal/pkg/email"
+	"github.com/Solidform-labs/newsletter/pkg/encryptdecrypt"
+	"github.com/Solidform-labs/newsletter/pkg/tokens"
 	"github.com/Solidform-labs/newsletter/pkg/validation"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 // Add missing import statement
@@ -101,7 +102,7 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 	}
 	err = email.SendNewsletter(subs, "Newsletter", "This is a test newsletter")
 	if err != nil {
-		log.Println("error", err)
+		log.Error("error", err)
 	}
 
 	return nil
@@ -146,4 +147,36 @@ func SendEmailToSubscriber(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON("Email sent to subscriber")
+}
+
+func AuthenticateAndSendToken(c *fiber.Ctx) error {
+	reqBody := new(models.User)
+
+	if err := c.BodyParser(reqBody); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
+			Message: "Make sure to pass your email and password",
+			Error:   err.Error(),
+		})
+	}
+
+	var foundUser models.User
+
+	if err := db.GetUserByEmail(reqBody.Email, &foundUser); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
+			Message: "Could not find user",
+			Error:   err.Error(),
+		})
+	}
+
+	if !encryptdecrypt.CheckPassword(foundUser.Password, reqBody.Password) {
+		log.Warn("Password did not match")
+		return c.Status(fiber.StatusUnauthorized).JSON("Unauthorized")
+	}
+
+	token, err := tokens.CreateToken(reqBody.Email)
+	if err != nil {
+		panic(err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": token})
 }
