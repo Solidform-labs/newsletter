@@ -95,51 +95,47 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 
 }
 
-func SendEmailToSubscribers(c *fiber.Ctx) error {
-	subs, err := db.GetSubscribers()
-	if err != nil {
-		return err
-	}
-	err = email.SendNewsletter(subs, "Newsletter", "This is a test newsletter")
-	if err != nil {
-		log.Error("error", err)
-	}
-
-	return nil
-}
-
 func SendEmailToSubscriber(c *fiber.Ctx) error {
-	id := c.Params("id")
+	var arrayOfUsers []string
+	if err := c.BodyParser(arrayOfUsers); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
+			Message: "The body does not contain an array of users",
+			Error:   err.Error(),
+		})
+	}
 
-	if id == "" {
+	if len(arrayOfUsers) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "id is required",
 		})
 	}
 
-	var subscriber models.Subscriber
+	var subscribers []models.Subscriber
 
-	if validation.IsValidEmail(id) {
-		if err := db.GetSubscriberByEmail(id, &subscriber); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "No subscriber found with given Email",
-				"error":   err.Error(),
-			})
+	for i := 0; i < len(arrayOfUsers); i++ {
+		var user = arrayOfUsers[i]
+		var subscriberPosition = &subscribers[i]
+
+		if validation.IsValidEmail(user) {
+			if err := db.GetSubscriberByEmail(user, subscriberPosition); err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"message": "No subscriber found with given Email",
+					"error":   err.Error(),
+				})
+			}
+		}
+
+		if isNumericID, intID := validation.ParseNumericID(user); isNumericID {
+			if err := db.GetSubscriberByid(intID, subscriberPosition); err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"message": "No subscriber found with given id",
+					"error":   err.Error(),
+				})
+			}
 		}
 	}
 
-	if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
-		if err := db.GetSubscriberByid(intID, &subscriber); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "No subscriber found with given id",
-				"error":   err.Error(),
-			})
-		}
-	}
-
-	subscriberArr := []models.Subscriber{subscriber}
-
-	if err := email.SendNewsletter(subscriberArr, "Newsletter", "This is a test newsletter"); err != nil {
+	if err := email.SendNewsletter(subscribers, "Newsletter", "This is a test newsletter"); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error sending emal to subscriber",
 			"error":   err.Error(),
