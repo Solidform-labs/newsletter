@@ -95,7 +95,7 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 
 }
 
-func SendEmailToSubscriber(c *fiber.Ctx) error {
+func SendEmailToSubscribers(c *fiber.Ctx) error {
 	var arrayOfUsers []string
 	if err := c.BodyParser(arrayOfUsers); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
