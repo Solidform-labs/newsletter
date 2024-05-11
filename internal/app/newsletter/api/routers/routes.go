@@ -27,5 +27,5 @@ func Setup(app *fiber.App) {
 	// subs.Get("/", controllers.ListSubscribers)
 	// subs.Get("/:id", controllers.GetSubscriber)
 	subs.Post("/send", controllers.SendEmailToSubscribers)
-	subs.Post("/send/:id", controllers.SendEmailToSubscriber)
+	subs.Post("/send/:id", controllers.SendEmailToSubscribers)
 }
