@@ -17,6 +17,10 @@ import (
 )
 
 func CheckAuth(c *fiber.Ctx) error {
+	if c.IP() == "127.0.0.1" {
+		log.Info("Local request, skipping auth check")
+		return c.Next()
+	}
 	authHeader := c.Get("Authorization")
 
 	if authHeader == "" {
