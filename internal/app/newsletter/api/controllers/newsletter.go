@@ -106,7 +106,7 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 
 	if len(arrayOfUsers) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "id is required",
+			"error": "the list of users passed to the function is empty",
 		})
 	}
 
