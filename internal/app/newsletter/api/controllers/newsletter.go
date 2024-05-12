@@ -96,28 +96,27 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 }
 
 func SendEmailToSubscribers(c *fiber.Ctx) error {
-	var arrayOfUsers []string
-	if err := c.BodyParser(arrayOfUsers); err != nil {
+	ids := []string{}
+	if err := c.BodyParser(ids); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
 			Message: "The body does not contain an array of users",
 			Error:   err.Error(),
 		})
 	}
 
-	if len(arrayOfUsers) == 0 {
+	if len(ids) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "the list of users passed to the function is empty",
 		})
 	}
 
-	var subscribers []models.Subscriber
+	subscribers := []models.Subscriber{}
 
-	for i := 0; i < len(arrayOfUsers); i++ {
-		var user = arrayOfUsers[i]
+	for i, id := range ids {
 		var subscriberPosition = &subscribers[i]
 
-		if validation.IsValidEmail(user) {
-			if err := db.GetSubscriberByEmail(user, subscriberPosition); err != nil {
+		if validation.IsValidEmail(id) {
+			if err := db.GetSubscriberByEmail(id, subscriberPosition); err != nil {
 				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 					"message": "No subscriber found with given Email",
 					"error":   err.Error(),
@@ -125,7 +124,7 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 			}
 		}
 
-		if isNumericID, intID := validation.ParseNumericID(user); isNumericID {
+		if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
 			if err := db.GetSubscriberByid(intID, subscriberPosition); err != nil {
 				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 					"message": "No subscriber found with given id",
