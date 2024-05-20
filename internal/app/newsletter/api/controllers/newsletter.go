@@ -111,14 +111,17 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 // @Failure 500 {object} models.BaseError " Internal Error message"
 // @Router /newsletter/subscribers/send [post]
 func SendEmailToSubscribers(c *fiber.Ctx) error {
-	ids := []string{}
-	if err := c.BodyParser(&ids); err != nil {
+	emailConfig := models.EmailConfig{}
+	if err := c.BodyParser(&emailConfig); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
 			Message: "The body does not contain an array of ids",
 			Error:   err.Error(),
 		})
 	}
-	log.Debug("ids: ", ids)
+
+	ids := emailConfig.Ids
+	subject := emailConfig.Subject
+	body := emailConfig.Body
 
 	if len(ids) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -151,7 +154,7 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 		}
 	}
 
-	if err := email.SendNewsletter(subscribers, "Newsletter", "This is a test newsletter"); err != nil {
+	if err := email.SendNewsletter(subscribers, subject, body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error sending emal to subscriber",
 			"error":   err.Error(),
