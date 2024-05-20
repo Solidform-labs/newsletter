@@ -95,6 +95,15 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 
 }
 
+// Sends email to an array of subscribers
+// @Summary Sends emails to a list of subscribers passed to the endpoint.
+// @Description Sends emails to a list of subscribers passed to the endpoint.
+// @Tags subscribers
+// @Param id path string true "list of subscribers"
+// @Success 204
+// @Failure 400 {object} models.BaseError "Bad Request Error message"
+// @Failure 500 {object} models.BaseError " Internal Error message"
+// @Router /newsletter/subscribers/send [post]
 func SendEmailToSubscribers(c *fiber.Ctx) error {
 	ids := []string{}
 	if err := c.BodyParser(ids); err != nil {
