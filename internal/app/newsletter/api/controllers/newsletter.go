@@ -67,9 +67,15 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 			"error": "id is required",
 		})
 	}
+	deleteKey := c.Query("delete_key")
+	if deleteKey == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "delete_key is required",
+		})
+	}
 
 	if validation.IsValidEmail(id) {
-		if err := db.DeleteSubscriberByEmail(id); err != nil {
+		if err := db.DeleteSubscriberByEmail(id, deleteKey); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": "Could not unsubscribe",
 				"error":   err.Error(),
@@ -79,7 +85,7 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 	if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
-		if err := db.DeleteSubscriberByID(intID); err != nil {
+		if err := db.DeleteSubscriberByID(intID, deleteKey); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": "Could not unsubscribe",
 				"error":   err.Error(),
@@ -106,12 +112,13 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 // @Router /newsletter/subscribers/send [post]
 func SendEmailToSubscribers(c *fiber.Ctx) error {
 	ids := []string{}
-	if err := c.BodyParser(ids); err != nil {
+	if err := c.BodyParser(&ids); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
-			Message: "The body does not contain an array of users",
+			Message: "The body does not contain an array of ids",
 			Error:   err.Error(),
 		})
 	}
+	log.Debug("ids: ", ids)
 
 	if len(ids) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -119,8 +126,9 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 		})
 	}
 
-	subscribers := []models.Subscriber{}
+	subscribers := make([]models.Subscriber, len(ids))
 
+	log.Debug("ids: ", ids)
 	for i, id := range ids {
 		var subscriberPosition = &subscribers[i]
 
