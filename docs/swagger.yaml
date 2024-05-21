@@ -9,6 +9,17 @@ definitions:
       message:
         type: string
     type: object
+  models.EmailConfig:
+    properties:
+      body:
+        type: string
+      ids:
+        items:
+          type: string
+        type: array
+      subject:
+        type: string
+    type: object
   models.Subscriber:
     properties:
       email:
@@ -67,10 +78,36 @@ paths:
           schema:
             $ref: '#/definitions/models.BaseError'
         "500":
-          description: ' Internal Error message'
+          description: Internal Error message
           schema:
             $ref: '#/definitions/models.BaseError'
       summary: Delete a subscriber
+      tags:
+      - subscribers
+  /newsletter/subscribers/send:
+    post:
+      description: Sends emails to a list of subscribers passed to the endpoint.
+      parameters:
+      - description: Email configuration
+        in: body
+        name: emailConfig
+        required: true
+        schema:
+          $ref: '#/definitions/models.EmailConfig'
+      responses:
+        "200":
+          description: Email sent to subscribers
+          schema:
+            type: string
+        "400":
+          description: Bad Request Error message
+          schema:
+            $ref: '#/definitions/models.BaseError'
+        "500":
+          description: Internal Error message
+          schema:
+            $ref: '#/definitions/models.BaseError'
+      summary: Send emails
       tags:
       - subscribers
 produces:

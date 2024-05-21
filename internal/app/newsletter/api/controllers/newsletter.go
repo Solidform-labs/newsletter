@@ -58,7 +58,7 @@ func AddSubscriber(c *fiber.Ctx) error {
 // @Param id path string true "Subscriber ID or email"
 // @Success 204
 // @Failure 400 {object} models.BaseError "Bad Request Error message"
-// @Failure 500 {object} models.BaseError " Internal Error message"
+// @Failure 500 {object} models.BaseError "Internal Error message"
 // @Router /newsletter/subscribers/{id} [delete]
 func DeleteSubscriber(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -101,58 +101,67 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 
 }
 
+// Sends email to an array of subscribers
+// @Summary Send emails
+// @Description Sends emails to a list of subscribers passed to the endpoint.
+// @Tags subscribers
+// @Param emailConfig body models.EmailConfig true "Email configuration"
+// @Success 200 {string} string "Email sent to subscribers"
+// @Failure 400 {object} models.BaseError "Bad Request Error message"
+// @Failure 500 {object} models.BaseError "Internal Error message"
+// @Router /newsletter/subscribers/send [post]
 func SendEmailToSubscribers(c *fiber.Ctx) error {
-	subs, err := db.GetSubscribers()
-	if err != nil {
-		return err
-	}
-	err = email.SendNewsletter(subs, "Newsletter", "This is a test newsletter")
-	if err != nil {
-		log.Error("error", err)
-	}
-
-	return nil
-}
-
-func SendEmailToSubscriber(c *fiber.Ctx) error {
-	id := c.Params("id")
-
-	if id == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "id is required",
+	emailConfig := models.EmailConfig{}
+	if err := c.BodyParser(&emailConfig); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.BaseError{
+			Message: "The body does not contain an array of ids",
+			Error:   err.Error(),
 		})
 	}
 
-	var subscriber models.Subscriber
+	ids := emailConfig.Ids
+	subject := emailConfig.Subject
+	body := emailConfig.Body
 
-	if validation.IsValidEmail(id) {
-		if err := db.GetSubscriberByEmail(id, &subscriber); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "No subscriber found with given Email",
-				"error":   err.Error(),
-			})
+	if len(ids) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "the list of users passed to the function is empty",
+		})
+	}
+
+	subscribers := make([]models.Subscriber, len(ids))
+
+	log.Debug("ids: ", ids)
+	for i, id := range ids {
+		var currentSubscriber = &subscribers[i]
+
+		if validation.IsValidEmail(id) {
+			if err := db.GetSubscriberByEmail(id, currentSubscriber); err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"message": "No subscriber found with given Email",
+					"error":   err.Error(),
+				})
+			}
+		}
+
+		if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
+			if err := db.GetSubscriberByid(intID, currentSubscriber); err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"message": "No subscriber found with given id",
+					"error":   err.Error(),
+				})
+			}
 		}
 	}
 
-	if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
-		if err := db.GetSubscriberByid(intID, &subscriber); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "No subscriber found with given id",
-				"error":   err.Error(),
-			})
-		}
-	}
-
-	subscriberArr := []models.Subscriber{subscriber}
-
-	if err := email.SendNewsletter(subscriberArr, "Newsletter", "This is a test newsletter"); err != nil {
+	if err := email.SendNewsletter(subscribers, subject, body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error sending emal to subscriber",
 			"error":   err.Error(),
 		})
 	}
 
-	return c.Status(200).JSON("Email sent to subscriber")
+	return c.Status(200).JSON("Email sent to subscribers")
 }
 
 func AuthenticateAndSendToken(c *fiber.Ctx) error {

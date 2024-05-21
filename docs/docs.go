@@ -64,6 +64,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/newsletter/subscribers/send": {
+            "post": {
+                "description": "Sends emails to a list of subscribers passed to the endpoint.",
+                "tags": [
+                    "subscribers"
+                ],
+                "summary": "Send emails",
+                "parameters": [
+                    {
+                        "description": "Email configuration",
+                        "name": "emailConfig",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EmailConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email sent to subscribers",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request Error message",
+                        "schema": {
+                            "$ref": "#/definitions/models.BaseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error message",
+                        "schema": {
+                            "$ref": "#/definitions/models.BaseError"
+                        }
+                    }
+                }
+            }
+        },
         "/newsletter/subscribers/{id}": {
             "delete": {
                 "description": "Delete a subscriber from the newsletter",
@@ -91,7 +131,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": " Internal Error message",
+                        "description": "Internal Error message",
                         "schema": {
                             "$ref": "#/definitions/models.BaseError"
                         }
@@ -108,6 +148,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.EmailConfig": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "subject": {
                     "type": "string"
                 }
             }
