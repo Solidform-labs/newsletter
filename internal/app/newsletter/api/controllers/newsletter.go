@@ -58,7 +58,7 @@ func AddSubscriber(c *fiber.Ctx) error {
 // @Param id path string true "Subscriber ID or email"
 // @Success 204
 // @Failure 400 {object} models.BaseError "Bad Request Error message"
-// @Failure 500 {object} models.BaseError " Internal Error message"
+// @Failure 500 {object} models.BaseError "Internal Error message"
 // @Router /newsletter/subscribers/{id} [delete]
 func DeleteSubscriber(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -102,13 +102,13 @@ func DeleteSubscriber(c *fiber.Ctx) error {
 }
 
 // Sends email to an array of subscribers
-// @Summary Sends emails to a list of subscribers passed to the endpoint.
+// @Summary Send emails
 // @Description Sends emails to a list of subscribers passed to the endpoint.
 // @Tags subscribers
-// @Param id path string true "list of subscribers"
-// @Success 204
+// @Param emailConfig body models.EmailConfig true "Email configuration"
+// @Success 200 {string} string "Email sent to subscribers"
 // @Failure 400 {object} models.BaseError "Bad Request Error message"
-// @Failure 500 {object} models.BaseError " Internal Error message"
+// @Failure 500 {object} models.BaseError "Internal Error message"
 // @Router /newsletter/subscribers/send [post]
 func SendEmailToSubscribers(c *fiber.Ctx) error {
 	emailConfig := models.EmailConfig{}
@@ -161,7 +161,7 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(200).JSON("Email sent to subscriber")
+	return c.Status(200).JSON("Email sent to subscribers")
 }
 
 func AuthenticateAndSendToken(c *fiber.Ctx) error {
