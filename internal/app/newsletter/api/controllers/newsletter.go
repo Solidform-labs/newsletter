@@ -133,10 +133,10 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 
 	log.Debug("ids: ", ids)
 	for i, id := range ids {
-		var subscriberPosition = &subscribers[i]
+		var currentSubscriber = &subscribers[i]
 
 		if validation.IsValidEmail(id) {
-			if err := db.GetSubscriberByEmail(id, subscriberPosition); err != nil {
+			if err := db.GetSubscriberByEmail(id, currentSubscriber); err != nil {
 				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 					"message": "No subscriber found with given Email",
 					"error":   err.Error(),
@@ -145,7 +145,7 @@ func SendEmailToSubscribers(c *fiber.Ctx) error {
 		}
 
 		if isNumericID, intID := validation.ParseNumericID(id); isNumericID {
-			if err := db.GetSubscriberByid(intID, subscriberPosition); err != nil {
+			if err := db.GetSubscriberByid(intID, currentSubscriber); err != nil {
 				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 					"message": "No subscriber found with given id",
 					"error":   err.Error(),
